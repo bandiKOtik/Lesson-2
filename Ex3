@@ -1,0 +1,39 @@
+using static System.Console;
+internal class Program
+{
+    static void Main(string[] args)
+    {
+        const string flipCommand = "flip";
+        const string exitCommand = "exit";
+        Random random = new Random();
+        bool isPlaying = true;
+
+        WriteLine($"Игра \"Орёл или решка\".");
+
+        while (isPlaying)
+        {
+            WriteLine($"Введите {flipCommand.ToUpper()} в консоль, чтобы подбросить. {exitCommand.ToUpper()} для выхода.");
+            string userCommand = ReadLine();
+
+            if (userCommand == null) break;
+            switch (userCommand.ToLower())
+            {
+                case flipCommand:
+                    if (random.Next(0, 2) == 0)
+                        WriteLine("Вам выпал Орёл!");
+                    else
+                        WriteLine("Вам выпала Решка!");
+                    WriteLine("Нажмите для продолжения");
+                    break;
+
+                case exitCommand:
+                    WriteLine("Программа завершает свою работу.");
+                    isPlaying = false;
+                    break;
+            }
+
+            ReadLine();
+            Clear();
+        }
+    }
+}
