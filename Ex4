@@ -1,0 +1,52 @@
+using static System.Console;
+internal class Program
+{
+    static void Main(string[] args)
+    {
+        const string equalsCommand = "=";
+        int[] valuesArray = new int[5];
+        int currentEmptyValue = 0;
+        bool isTyping = true;
+
+        WriteLine($"Вводите целочисленные значения в консоль. \nКак закончите, введите команду \"{equalsCommand}\", чтобы сложить их все.");
+
+        while (isTyping)
+        {
+            if (currentEmptyValue >= valuesArray.Length)
+                valuesArray = IntArrayResize(valuesArray);
+
+            Write($"Сейчас редактируется {currentEmptyValue + 1} число: ");
+            string userCommand = ReadLine();
+
+            if (userCommand == equalsCommand)
+            {
+                isTyping = false;
+                int totalValue = 0;
+                for (int i = 0; i < valuesArray.Length; i++)
+                    totalValue += valuesArray[i];
+                WriteLine($"Сумма всех введённых чисел составила: {totalValue}. \nНажмите для завершения.");
+                ReadLine();
+            }
+
+            else if (int.TryParse(userCommand, out int value))
+            {
+                valuesArray[currentEmptyValue] = value;
+                currentEmptyValue++;
+            }
+
+            else
+                WriteLine("\nНеизвестная команда, или строка не является числом, попробуйте снова.");
+        }
+    }
+
+    static int[] IntArrayResize(int[] arrayToResize)
+    {
+        int[] tempArray = new int[arrayToResize.Length + 1];
+
+        for (int i = 0; i < arrayToResize.Length; i++)
+            tempArray[i] = arrayToResize[i];
+
+        tempArray[tempArray.Length - 1] = 0;
+        return tempArray;
+    }
+}
