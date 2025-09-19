@@ -1,0 +1,22 @@
+using static System.Console;
+internal class Program
+{
+    static void Main(string[] args)
+    {
+        Random random = new Random();
+        int arrayCapacity = random.Next(0, 101);
+        int[] intRandomArray = new int[arrayCapacity];
+
+        WriteLine($"Создан массив, размером {arrayCapacity} элементов.");
+        WriteLine("Его переменные: ");
+
+        for (int i = 0; i < intRandomArray.Length; i++)
+        {
+            intRandomArray[i] = random.Next(10, 21);
+            Write($"{intRandomArray[i]} ");
+        }
+
+        WriteLine("\nНажмите, чтобы завершить работу приложения.");
+        ReadLine();
+    }
+}
