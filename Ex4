@@ -3,29 +3,32 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        const string equalsCommand = "=";
+        const string exitCommand = "exit";
+        const string sumCommand = "=";
         int[] valuesArray = new int[5];
         int currentEmptyValue = 0;
         bool isTyping = true;
 
-        WriteLine($"Вводите целочисленные значения в консоль. \nКак закончите, введите команду \"{equalsCommand}\", чтобы сложить их все.");
+        WriteLine($"Вводите целочисленные значения в консоль. \nКак закончите, введите команду \"{sumCommand}\", чтобы сложить их все.");
 
         while (isTyping)
         {
             if (currentEmptyValue >= valuesArray.Length)
-                valuesArray = IntArrayResize(valuesArray);
+                valuesArray = IncrementArraySize(valuesArray);
 
             Write($"Сейчас редактируется {currentEmptyValue + 1} число: ");
             string userCommand = ReadLine();
 
-            if (userCommand == equalsCommand)
+            if (userCommand == sumCommand)
             {
-                isTyping = false;
                 int totalValue = 0;
                 for (int i = 0; i < valuesArray.Length; i++)
                     totalValue += valuesArray[i];
-                WriteLine($"Сумма всех введённых чисел составила: {totalValue}. \nНажмите для завершения.");
+                currentEmptyValue = 0;
+                WriteLine($"Сумма всех введённых чисел составила: {totalValue}. \nНажмите, чтобы повторить цикл.");
                 ReadLine();
+                Clear();
+                continue;
             }
 
             else if (int.TryParse(userCommand, out int value))
@@ -34,12 +37,18 @@ internal class Program
                 currentEmptyValue++;
             }
 
-            else
+            else if (userCommand == exitCommand) { // Опишу этот формат записи в вопросе
+                isTyping = false;
+                WriteLine("Программа завершает свою работу.");
+            }
+
+            else {
                 WriteLine("\nНеизвестная команда, или строка не является числом, попробуйте снова.");
+            }
         }
     }
 
-    static int[] IntArrayResize(int[] arrayToResize)
+    static int[] IncrementArraySize(int[] arrayToResize)
     {
         int[] tempArray = new int[arrayToResize.Length + 1];
 
