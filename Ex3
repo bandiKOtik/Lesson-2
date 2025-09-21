@@ -1,9 +1,14 @@
 using static System.Console;
+
 internal class Program
 {
     static void Main(string[] args)
     {
-        const string flipCommand = "flip";
+        const string tailsCommand = "tails";
+        const string headsCommand = "heads";
+        const int tailSide = 0;
+        const int headsSide = 1;
+
         const string exitCommand = "exit";
         Random random = new Random();
         bool isPlaying = true;
@@ -12,18 +17,34 @@ internal class Program
 
         while (isPlaying)
         {
-            WriteLine($"Введите {flipCommand.ToUpper()} в консоль, чтобы подбросить. {exitCommand.ToUpper()} для выхода.");
-            string userCommand = ReadLine();
+            WriteLine($"Выберите сторону монетки, введя {tailsCommand.ToUpper()} или {headsCommand.ToUpper()} в консоль. {exitCommand.ToUpper()} для выхода.");
+            string userCommand = ReadLine().ToLower();
 
-            if (userCommand == null) break;
-            switch (userCommand.ToLower())
+            if (userCommand == null) continue;
+            else if (userCommand == exitCommand.ToLower() || userCommand == tailsCommand.ToLower() || userCommand == headsCommand.ToLower()) { }
+            else
             {
-                case flipCommand:
-                    if (random.Next(0, 2) == 0)
-                        WriteLine("Вам выпал Орёл!");
+                WriteLine("Введена несуществующая команда. Нажмите, чтобы повторить снова.");
+                ReadLine();
+                Clear();
+                continue;
+            }
+
+            int coinTossResult = random.Next(tailSide, headsSide + 1);
+            switch (userCommand)
+            {
+                case headsCommand:
+                    if (coinTossResult == tailSide)
+                        WriteLine("Выпал орёл. Победа!");
                     else
-                        WriteLine("Вам выпала Решка!");
-                    WriteLine("Нажмите для продолжения");
+                        WriteLine("Выпала решка! Вы проиграли.");
+                    break;
+
+                case tailsCommand:
+                    if (coinTossResult == headsSide)
+                        WriteLine("Выпала решка. Победа!");
+                    else
+                        WriteLine("Выпал орёл! Вы проиграли.");
                     break;
 
                 case exitCommand:
