@@ -1,0 +1,158 @@
+using static System.Console;
+internal class Program
+{
+    static bool exitRequested = false;
+    const string exitCommand = "exit";
+    const string rulesCommand = "rules";
+    const string clearCommand = "clear";
+    const int attempts = 6;
+    const int maxLines = 3;
+    const int maxColumns = 3;
+    static void Main(string[] args)
+    {
+        char[,] table = new char[maxLines, maxColumns];
+        Random random = new Random();
+        int[] randomElement = new int[2];
+
+        WriteLine($"Чтобы прочесть правила, в любой момент введите {rulesCommand.ToUpper()}, чтобы выйти, введите {exitCommand.ToUpper()}.\n");
+
+        while (exitRequested == false)
+        {
+            WriteLine(exitRequested);
+            table = FillTable(maxLines, maxColumns);
+            int currentGameAttempts = attempts;
+
+            for (int i = 0; i < 2; i++)
+                randomElement[i] = random.Next(table.GetLength(i));
+
+            while (currentGameAttempts > 0)
+            {
+                Clear();
+                WriteLine($"Попыток осталось: {currentGameAttempts}");
+                ShowTable(table);
+                int[] userMove = new int[2];
+
+                for (int i = 0; i < table.Rank;)
+                {
+                    if (i == 0)
+                        Write("Введите строку: ");
+                    else if (i == 1)
+                        Write("Введите столбец: ");
+
+                    string userInput = GetUserInput();
+                    if (userInput == exitCommand)
+                    {
+                        currentGameAttempts = 0;
+                        break;
+                    }
+                    else if (int.TryParse(userInput, out int value) && value <= table.GetLength(i) && value > 0)
+                    {
+                        userMove[i] = value - 1;
+                        i++;
+                    }
+                    else if (userInput == rulesCommand || userInput == clearCommand)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        WriteLine("Неверная команда или число за пределами таблицы, попробуйте снова.\n");
+                        continue;
+                    }
+                }
+
+                if (exitRequested == false)
+                {
+                    if (userMove[0] == randomElement[0] && userMove[1] == randomElement[1])
+                    {
+                        WriteLine("Поздравляем! Вы отгадали позицию. Нажмите ещё раз для продолжения.");
+                        ReadKey();
+                    }
+                    else if (currentGameAttempts == 1)
+                    {
+                        WriteLine("Мимо. Попытки закончились, вы проиграли. Попробуйте снова.");
+                        ReadKey();
+                    }
+                    else
+                    {
+                        currentGameAttempts -= 1;
+                        table[userMove[0], userMove[1]] = 'X';
+                        WriteLine("Мимо. Попробуйте ещё раз.");
+                        ReadKey();
+                    }
+                }
+            }
+        }
+
+        Clear();
+        WriteLine("Программа завершила работу. Нажмите для продолжения...");
+        Read();
+    }
+
+    static string GetUserInput()
+    {
+        string userInput = ReadLine().ToLower();
+
+        if (userInput == rulesCommand.ToLower())
+        {
+            WriteLine("Правила игры: Загадана позиция элемента, вам нужно отгадать где он находится, по очереди вводя строку, потом столбец." +
+                "\nУ вас имеется всего 6 попыток, если вы не отгадаете, игра сбросит прогресс и будет загадано новая позиция элемента." +
+                $"\nЧтобы покинуть игру, в любой момент введите {exitCommand.ToUpper()}, для очистки консоли введите {clearCommand.ToUpper()}.\n");
+            return rulesCommand;
+        }
+        else if (userInput == exitCommand.ToLower())
+        {
+            exitRequested = true;
+            return exitCommand;
+        }
+        else if (userInput == clearCommand)
+        {
+            Clear();
+            return clearCommand;
+        }
+        else
+        {
+            return userInput;
+        }
+    }
+
+    static char[,] FillTable(int length, int heigth)
+    {
+        char[,] table = new char[length, heigth];
+
+        for (int i = 0; i < table.GetLength(0); i++)
+        {
+            for (int j = 0; j < table.GetLength(1); j++)
+            {
+                table[i, j] = 'O';
+            }
+        }
+
+        return table;
+    }
+
+    static void ShowTable(char[,] table)
+    {
+        Write(" ");
+        for (int i = 0; i < table.GetLength(0); i++)
+        {
+            Write(" " + (i + 1));
+        }
+
+        WriteLine();
+
+        for (int i = 0; i < table.GetLength(0); i++)
+        {
+            Write(i + 1);
+
+            for (int j = 0; j < table.GetLength(1); j++)
+            {
+                Write(" " + table[i, j].ToString().ToUpper());
+            }
+
+            WriteLine();
+        }
+
+        WriteLine();
+    }
+}
