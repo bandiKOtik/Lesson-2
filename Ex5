@@ -1,20 +1,26 @@
+using System.Text;
 using static System.Console;
 internal class Program
 {
     static bool exitRequested = false;
     const string exitCommand = "exit";
-    const string rulesCommand = "rules";
+    const string helpCommand = "help";
     const string clearCommand = "clear";
+
     const int attempts = 6;
     const int maxLines = 3;
     const int maxColumns = 3;
+
+    const char emptyCellSign = 'O';
+    const char wrongCellSign = 'X';
+    const char correctCellSign = 'V';
     static void Main(string[] args)
     {
+        InputEncoding = Encoding.Unicode;
+        OutputEncoding = Encoding.Unicode;
         char[,] table = new char[maxLines, maxColumns];
         Random random = new Random();
-        int[] randomElement = new int[2];
-
-        WriteLine($"Чтобы прочесть правила, в любой момент введите {rulesCommand.ToUpper()}, чтобы выйти, введите {exitCommand.ToUpper()}.\n");
+        int[] randomElement = new int[table.Rank];
 
         while (exitRequested == false)
         {
@@ -27,23 +33,23 @@ internal class Program
             while (currentGameAttempts > 0)
             {
                 Clear();
+                WriteLine($"Чтобы прочесть правила и команды, в любой момент введите {helpCommand.ToUpper()}.\n");
                 WriteLine($"Попыток осталось: {currentGameAttempts}");
                 ShowTable(table);
                 int[] userMove = new int[table.Rank];
 
                 for (int i = 0; i < table.Rank; i++)
                 {
-                    bool answerCorret = false;
                     if (exitRequested == false)
                     {
+                        bool answerCorret = false;
+
                         do
                         {
                             if (i == 0)
                                 Write("Введите строку: ");
-                            else if (i == 1)
-                                Write("Введите столбец: ");
                             else
-                                Write($"Введите глубину {i} измерения: ");
+                                Write("Введите столбец: ");
 
                             string userInput = GetUserInput();
 
@@ -58,7 +64,7 @@ internal class Program
                                 userMove[i] = value - 1;
                                 answerCorret = true;
                             }
-                            else if (userInput == rulesCommand || userInput == clearCommand)
+                            else if (userInput == helpCommand || userInput == clearCommand)
                             {
                                 continue;
                             }
@@ -75,21 +81,46 @@ internal class Program
                 {
                     if (userMove[0] == randomElement[0] && userMove[1] == randomElement[1])
                     {
-                        WriteLine("Поздравляем! Вы отгадали позицию. Нажмите ещё раз для продолжения.");
-                        ReadKey();
+                        Clear();
+                        table[userMove[0], userMove[1]] = correctCellSign;
+                        ShowTable(table);
+                        WriteLine("Поздравляем! Вы отгадали позицию. Повторить игру? (Y/N)");
                     }
                     else if (currentGameAttempts == 1)
                     {
-                        WriteLine("Мимо. Попытки закончились, вы проиграли. Попробуйте снова.");
+                        WriteLine("Мимо. Попытки закончились, вы проиграли. Повторить игру? (Y/N)");
                         ReadKey();
                     }
                     else
                     {
                         currentGameAttempts -= 1;
-                        table[userMove[0], userMove[1]] = 'X';
-                        WriteLine("Мимо. Попробуйте ещё раз.");
+                        table[userMove[0], userMove[1]] = wrongCellSign;
+                        WriteLine("Мимо. Попробуйте другую позицию. Нажмите ещё раз для продолжения...");
                         ReadKey();
+                        continue;
                     }
+
+                    bool coorectAnswer = false;
+                    do
+                    {
+                        string input = ReadLine().ToLower();
+
+                        if (input == "y" || input == "yes" || input == "да" || input == "д")
+                        {
+                            coorectAnswer = true;
+                            currentGameAttempts = 0;
+                        }
+                        else if (input == "n" || input == "no" || input == "нет" || input == "н")
+                        {
+                            coorectAnswer = true;
+                            currentGameAttempts = 0;
+                            exitRequested = true;
+                        }
+                        else
+                        {
+                            WriteLine("Неизвестная команда. Повторите ввод.");
+                        }
+                    } while (coorectAnswer == false);
                 }
             }
         }
@@ -103,19 +134,20 @@ internal class Program
     {
         string userInput = ReadLine().ToLower();
 
-        if (userInput == rulesCommand.ToLower())
+        if (userInput == helpCommand.ToLower())
         {
-            WriteLine("Правила игры: Загадана позиция элемента, вам нужно отгадать где он находится, по очереди вводя строку, потом столбец." +
-                "\nУ вас имеется всего 6 попыток, если вы не отгадаете, игра сбросит прогресс и будет загадано новая позиция элемента." +
-                $"\nЧтобы покинуть игру, в любой момент введите {exitCommand.ToUpper()}, для очистки консоли введите {clearCommand.ToUpper()}.\n");
-            return rulesCommand;
+            WriteLine($"\nПравила игры: У вас есть поле, размером {maxLines} на {maxColumns}, в котором загадана одна позиция элемента.\n" +
+                $"Вам нужно отгадать, где он находится. Для этого по очереди вводите, сначала строку, затем столбец.\n" +
+                $"У вас имеется {attempts} попыток, если вы не отгадаете, игра сбросит прогресс и будет загадана новая позиция элемента.\n" +
+                $"Чтобы покинуть игру, в любой момент введите {exitCommand.ToUpper()}, для очистки консоли введите {clearCommand.ToUpper()}.\n");
+            return helpCommand;
         }
         else if (userInput == exitCommand.ToLower())
         {
             exitRequested = true;
             return exitCommand;
         }
-        else if (userInput == clearCommand)
+        else if (userInput == clearCommand.ToLower())
         {
             Clear();
             return clearCommand;
@@ -134,7 +166,7 @@ internal class Program
         {
             for (int j = 0; j < table.GetLength(1); j++)
             {
-                table[i, j] = 'O';
+                table[i, j] = emptyCellSign;
             }
         }
 
@@ -144,6 +176,7 @@ internal class Program
     static void ShowTable(char[,] table)
     {
         Write(" ");
+
         for (int i = 0; i < table.GetLength(0); i++)
         {
             Write(" " + (i + 1));
